@@ -1,0 +1,102 @@
+= NutsBoard LEDE BSP
+
+Environment Setup
+
+[source,console]
+% sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib \
+ build-essential chrpath  socat gawk zlib1g libncurses5 flex libncurses5-dev \
+ libsdl1.2-dev xterm  sed cvs subversion coreutils texi2html \
+ docbook-utils python-pysqlite2 help2man make gcc g++ desktop-file-utils \
+ libgl1-mesa-dev libglu1-mesa-dev mercurial autoconf automake groff curl lzop asciidoc
+
+For Ubuntu 12.04 host setup only:
+[source,console]
+% sudo apt-get install uboot-mkimage
+
+For Ubuntu 14.04 or later revision host setup:
+[source,console]
+% sudo apt-get install u-boot-tools
+
+Alternative toolchain setup:
+
+General GCC toolchain from Ubuntu host.
+[source,console]
+% sudo apt-get install gcc-arm-linux-gnueabihf
+
+Use your own toolchain (ex: nutsboard recommend cross compilier)
+[source,console]
+% wget https://releases.linaro.org/components/toolchain/binaries/5.3-2016.02/arm-linux-gnueabihf/gcc-linaro-5.3-2016.02-x86_64_arm-linux-gnueabihf.tar.xz
+% mv gcc-linaro-xxxxx toolchain
+
+To get the BSP you need to have repo installed and use it as:
+
+Download the BSP source:
+
+[source,console]
+% PATH=${PATH}:~/bin
+% mkdir lede_project
+% cd lede_project
+% repo init -u https://github.com/nutsboard/nutsboard-lede-bsp.git -b lede-17.01-am335x
+% repo sync
+
+
+
+At the end of the commands you have every source you need to start work with:
+
+cookers: setup compile environment easily.
+
+u-boot-am335x: NutsBoard official u-boot source code.
+
+linux-am335x: NutsBoard official linux kernel source code.
+
+lede: NutsBoard LEDE-17.01 open embedded rootfs source code.
+
+To start a simple image build:
+First, setup the compile envirement:
+[source,console]
+% cd <local path>/
+% source cookers/env.bash.nutsboard.almond.walnut
+
+For full build:
+[source,console]
+% cook -j8
+
+For a rebuild:
+[source,console]
+% heat -j8
+
+To clean build area (“make distclean”):
+[source,console]
+% throw
+
+To generate a SD card image:
+[source,console]
+% flashcard sdx <sdx is depend on your SD card device node, ex: sde>
+
+
+To generate a ubi image for NAND flash, you need to insert a ready sd card image first :
+[source,console]
+% ubi_create /dev/sdx <sdx is depend on your SD card device node, ex: /dev/sde>
+
+
+The image elements as follows:
+
+Example - Almond
+
+Partition 1: MLO, u-boot.img, zImage, am335x-nutsboard-almond.dtb, uEnv.txt
+
+Partition 2: rootfs with kernel modules
+
+To re-configuration your Kernel menuconfig:
+[source,console]
+% cd linux-am335x
+% recipe
+
+To re-configuration your LEDE menuconfig:
+[source,console]
+% cd lede
+% make menuconfig
+
+
+Then re-compile again!
+
